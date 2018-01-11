@@ -24,7 +24,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/on", onHandler)
 	r.HandleFunc("/off", offHandler)
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public/")))
 	http.Handle("/", r)
 
 	http.ListenAndServe(":"+fmt.Sprint(*port), r)
