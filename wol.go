@@ -25,7 +25,7 @@ func newMagicPacket(target net.HardwareAddr) MagicPacket {
 	buf := make([]byte, 0)
 	head, err := hex.DecodeString("ffffffffffff")
 	if err != nil {
-		log.Panic("cannot decode string into bytes: %v", err)
+		log.Panic("cannot decode string into bytes:", err)
 	}
 	buf = append(buf, head...)
 
