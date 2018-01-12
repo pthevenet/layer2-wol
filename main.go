@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
-	"net/http"
 	"net"
+	"net/http"
 )
 
 func main() {
 	var (
-		macS  = flag.String("mac", "", "MAC address of the target computer")
-		port = flag.Uint("port", 8080, "port for the webserver")
+		macS      = flag.String("mac", "", "MAC address of the target computer")
+		port      = flag.Uint("port", 8080, "port for the webserver")
 		ifacename = flag.String("interface", "lo", "interface name")
 	)
 	flag.Parse()
@@ -24,7 +24,7 @@ func main() {
 		log.Fatal("MAC address is invalid:", err)
 	}
 
-	iface, err :=  net.InterfaceByName(*ifacename)
+	iface, err := net.InterfaceByName(*ifacename)
 	if err != nil {
 		log.Fatal("Interface is invalid:", err)
 	}
@@ -42,10 +42,7 @@ func main() {
 
 func onHandler(w http.ResponseWriter, r *http.Request, mac net.HardwareAddr, iface *net.Interface) {
 	log.Println("ON REQUEST target", mac.String(), "interface", iface.Name)
-
-	// create magic packet
-	mpkt := MagicPacket{mac}
-	err := SendMagicPacket(mpkt, iface)
+	err := WakeOnLan(mac, iface)
 	if err != nil {
 		log.Println("Error:", err)
 	}
