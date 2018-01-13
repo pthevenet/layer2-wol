@@ -1,13 +1,14 @@
 // A layer 2 Wake on Lan Magic Packet
-package main
+package wol
 
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/mdlayher/ethernet"
-	"github.com/mdlayher/raw"
 	"log"
 	"net"
+
+	"github.com/mdlayher/ethernet"
+	"github.com/mdlayher/raw"
 )
 
 // WakeOnLan sends a WoL packet (magic packet) to wake target
