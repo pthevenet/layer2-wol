@@ -1,4 +1,4 @@
-// A layer 2 Wake on Lan Magic Packet
+// Package wol offers a function for sending a layer 2 wake on lan packet
 package wol
 
 import (
@@ -23,7 +23,7 @@ type MagicPacket struct {
 
 // NewMagicPacket constructs a MagicPacket with the target MAC address
 func newMagicPacket(target net.HardwareAddr) MagicPacket {
-	buf := make([]byte, 0)
+	var buf []byte
 	head, err := hex.DecodeString("ffffffffffff")
 	if err != nil {
 		log.Panic("cannot decode string into bytes:", err)
