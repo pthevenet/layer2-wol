@@ -19,7 +19,7 @@ func main() {
 		ipS        = flag.String("ip", "", "IP address of the target computer")
 		ifacename  = flag.String("interface", "lo", "interface name")
 		port       = flag.Uint("port", 8080, "port for the webserver")
-		targetPort = flag.Uint("target port", 8080, "port of the target 'off' service")
+		targetPort = flag.Uint("targetport", 8080, "port of the target 'off' service")
 	)
 	flag.Parse()
 
