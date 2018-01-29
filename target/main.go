@@ -37,7 +37,6 @@ func startHttpServer(port int, trustedNet net.IPNet) {
 
 		ip := net.ParseIP(ipString)
 		if ip == nil {
-			log.Printf()
 			http.Error(w, "request error", http.StatusBadRequest)
 			return
 		}
