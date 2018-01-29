@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -16,8 +17,8 @@ import (
 // anyone in the given network will have power to shutdown the machine
 // IP spoofing will work, therefore do not use this outside the LAN and use only local IP CIDRs
 func main() {
-	port := flag.Uint("port", 8080, "port for the off service")
-	trustedNetwork := flag.String("net", "192.168.0.0/24", "network CIDR for accepting requests")
+	port := flag.Int("port", 8080, "port for the off service")
+	trustedNetwork := flag.String("net", "192.168.0.0/24", "subnet CIDR for accepting requests")
 	flag.Parse()
 
 	_, trustedNet, err := net.ParseCIDR(*trustedNetwork)
@@ -25,21 +26,32 @@ func main() {
 		log.Fatal("error net must be a cidr network:", err)
 	}
 
+	startHttpServer(*port, *trustedNet)
+}
+
+func startHttpServer(port int, trustedNet net.IPNet) {
+	srv := &http.Server{Addr: ":" + strconv.Itoa(port)}
+
 	http.HandleFunc("/off", func(w http.ResponseWriter, r *http.Request) {
 		ipString := strings.Split(r.RemoteAddr, ":")[0]
 
 		ip := net.ParseIP(ipString)
 		if ip == nil {
+			log.Printf()
+			http.Error(w, "request error", http.StatusBadRequest)
 			return
 		}
+
 		log.Println("OFF Request by", ip)
+
 		if !trustedNet.Contains(ip) {
-			log.Println("ILLIGITIMATE")
-			fmt.Fprint(w, "ILLIGITIMATE OFF request received.")
+			log.Printf("ILLIGITIMATE OFF REQUEST from: %v.", ip.String())
+			http.Error(w, "not authorized : "+ip.String(), http.StatusUnauthorized)
 			return
 		}
+
 		log.Println("LEGITIMATE")
-		fmt.Fprint(w, "LEGITIMATE OFF request received.\n")
+		fmt.Fprint(w, "LEGITIMATE OFF request received from %v.\n", ip.String())
 		fmt.Fprint(w, "system will shutdown")
 
 		// trusted request
@@ -50,12 +62,16 @@ func main() {
 			log.Printf("shutdown command finished with error: %v", err)
 		} else {
 			log.Printf("shutdown command finished with no error")
+			// shutdown
+			if err := srv.Shutdown(nil); err != nil {
+				panic(err)
+			}
 		}
 	})
-	err = http.ListenAndServe(fmt.Sprintf(":%v", *port), nil)
 
+	err := srv.ListenAndServe()
 	if err != nil {
-		fmt.Println("error listening to port:", *port, ":", err)
+		log.Printf("http server error: %v", err)
 	}
 }
 
