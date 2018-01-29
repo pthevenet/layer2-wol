@@ -50,8 +50,8 @@ func startHttpServer(port int, trustedNet net.IPNet) {
 		}
 
 		log.Println("LEGITIMATE")
-		fmt.Fprint(w, "LEGITIMATE OFF request received from %v.\n", ip.String())
-		fmt.Fprint(w, "system will shutdown")
+		fmt.Fprintf(w, "LEGITIMATE OFF request received from %v.\n", ip.String())
+		fmt.Fprintln(w, "System will shutdown")
 
 		// trusted request
 
