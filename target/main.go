@@ -61,10 +61,6 @@ func startHttpServer(port int, trustedNet net.IPNet) {
 			log.Printf("shutdown command finished with error: %v", err)
 		} else {
 			log.Printf("shutdown command finished with no error")
-			// shutdown
-			if err := srv.Shutdown(nil); err != nil {
-				panic(err)
-			}
 		}
 	})
 
