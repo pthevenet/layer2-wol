@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/pthevenet/on-off/wol"
 )
 
@@ -38,17 +37,16 @@ func main() {
 		log.Fatal("Interface is invalid:", err)
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/on", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/on", func(w http.ResponseWriter, r *http.Request) {
 		onHandler(w, r, mac, iface)
 	})
-	r.HandleFunc("/off", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/off", func(w http.ResponseWriter, r *http.Request) {
 		offHandler(w, r, ip, *targetPort)
 	})
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public/")))
-	http.Handle("/", r)
+	fs := http.FileServer(http.Dir("public"))
+	http.Handle("/", fs)
 
-	http.ListenAndServe(":"+fmt.Sprint(*port), r)
+	http.ListenAndServe(":"+fmt.Sprint(*port), nil)
 }
 
 func onHandler(w http.ResponseWriter, r *http.Request, mac net.HardwareAddr, iface *net.Interface) {
@@ -56,7 +54,10 @@ func onHandler(w http.ResponseWriter, r *http.Request, mac net.HardwareAddr, ifa
 	err := wol.WakeOnLan(mac, iface)
 	if err != nil {
 		log.Println("Error:", err)
+		fmt.Fprint(w, "ON request executed with error: %v.\n", err)
+		return
 	}
+	fmt.Fprint(w, "ON request executed with no error.\n")
 }
 
 func offHandler(w http.ResponseWriter, r *http.Request, ip net.IP, port uint) {
@@ -65,5 +66,8 @@ func offHandler(w http.ResponseWriter, r *http.Request, ip net.IP, port uint) {
 	_, err := http.Get(url)
 	if err != nil {
 		log.Println("Error:", err)
+		fmt.Fprint(w, "OFF request executed with error: %v.\n", err)
+		return
 	}
+	fmt.Fprint(w, "OFF request executed with no error.\n")
 }

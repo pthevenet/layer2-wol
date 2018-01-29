@@ -35,13 +35,17 @@ func main() {
 		log.Println("OFF Request by", ip)
 		if !trustedNet.Contains(ip) {
 			log.Println("ILLIGITIMATE")
+			fmt.Fprint(w, "ILLIGITIMATE OFF request received.")
 			return
 		}
 		log.Println("LEGITIMATE")
+		fmt.Fprint(w, "LEGITIMATE OFF request received.\n")
+		fmt.Fprint(w, "system will shutdown")
 
 		// trusted request
 
 		err := off()
+
 		if err != nil {
 			log.Printf("shutdown command finished with error: %v", err)
 		} else {
