@@ -11,18 +11,17 @@ import (
 	"github.com/mdlayher/raw"
 )
 
-// WakeOnLan sends a WoL packet (magic packet) to wake target
-func WakeOnLan(target net.HardwareAddr, iface *net.Interface) error {
-	return newMagicPacket(target).send(iface)
-}
+///// API
 
-// MagicPacket is a broadcast frame containing FF FF FF FF FF FF followed by 16 repetitions of the target MAC address
-type MagicPacket struct {
-	payload []byte
+// WakeOnLan sends a WoL packet (magic packet) to wake target.
+// target is a MAC address that should be on the same ethernet LAN .
+// iface is the interface to send the wol packet on.
+func WakeOnLan(target net.HardwareAddr, iface *net.Interface) error {
+	return NewMagicPacket(target).send(iface)
 }
 
 // NewMagicPacket constructs a MagicPacket with the target MAC address
-func newMagicPacket(target net.HardwareAddr) MagicPacket {
+func NewMagicPacket(target net.HardwareAddr) MagicPacket {
 	var buf []byte
 	head, err := hex.DecodeString("ffffffffffff")
 	if err != nil {
@@ -35,6 +34,13 @@ func newMagicPacket(target net.HardwareAddr) MagicPacket {
 	}
 	return MagicPacket{buf}
 }
+
+// MagicPacket is a broadcast frame containing FF FF FF FF FF FF followed by 16 repetitions of the target MAC address
+type MagicPacket struct {
+	payload []byte
+}
+
+///// Implementation
 
 // Frame creates the ethernet frame for the magic packet
 func (mpkt MagicPacket) frame() ethernet.Frame {
