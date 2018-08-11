@@ -1,4 +1,4 @@
-// Package wol offers a function for sending a layer 2 wake on lan packet
+// Package wol offers a function for sending a layer 2 (non ip) wake on lan packet
 package wol
 
 import (
